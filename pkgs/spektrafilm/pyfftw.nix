@@ -1,31 +1,47 @@
 {
-  pkgs ? import <nixpkgs> {},
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  setuptools,
+  setuptools-scm,
+  numpy,
+  cython,
+  scipy,
+  fftw,
 }:
 
-pkgs.python3Packages.buildPythonPackage rec {
+buildPythonPackage rec {
   pname = "pyfftw";
   version = "0.15.1";
   pyproject = true;
   pythonRuntimeDepsCheck = false;
 
-  src = pkgs.python3Packages.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
     hash = "sha256-u83m1A0WXhy68S3eBi6/6+nkM5TKyMFm5pm6LJpLBGE=";
   };
 
-  build-system = with pkgs.python3Packages; [
+  build-system = [
     setuptools
     setuptools-scm
   ];
 
-  dependencies = with pkgs; [
-    python3Packages.numpy
-    python3Packages.cython
-    python3Packages.scipy
+  dependencies = [
+    numpy
+    cython
+    scipy
+  ];
+
+  nativeBuildInputs = [
     fftw
   ];
 
-  nativeBuildInputs = with pkgs; [
+  buildInputs = [
     fftw
   ];
+
+  meta = with lib; {
+    description = "A pythonic wrapper around FFTW";
+    homepage = "https://github.com/pyFFTW/pyFFTW";
+  };
 }

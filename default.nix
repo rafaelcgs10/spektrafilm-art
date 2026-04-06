@@ -10,19 +10,30 @@
 { pkgs ? import <nixpkgs> { } }:
 
 let
-  spektrafilm-python = import ./pkgs/spektrafilm/python-runtime.nix;
-  spektrafilm-pkgs = import (builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/25.05.tar.gz";
-  }) {
-    config.allowBroken = true;
+  # Import nixpkgs with our overlay that adds custom Python packages
+  spektrafilm-pkgs = import pkgs.path {
+    inherit (pkgs) system;
+    config = { allowBroken = true; };
     overlays = [
       (final: prev: {
         pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
           (python-final: python-prev: {
-            colour-science = import ./pkgs/spektrafilm/colour-science.nix { pkgs = final; };
-            pyfftw = import ./pkgs/spektrafilm/pyfftw.nix { pkgs = final; };
-            openimageio = import ./pkgs/spektrafilm/openimageio.nix { pkgs = final; };
-            spektrafilm = import ./pkgs/spektrafilm/spektrafilm.nix { pkgs = final; };
+            colour-science = python-final.callPackage ./pkgs/spektrafilm/colour-science.nix { };
+            pyfftw = python-final.callPackage ./pkgs/spektrafilm/pyfftw.nix {
+              inherit (final) fftw;
+            };
+            openimageio = python-final.callPackage ./pkgs/spektrafilm/openimageio.nix {
+              inherit (final)
+                fftw zlib imath openexr libjpeg libtiff libpng
+                openimageio freetype opencolorio opencv libraw libheif
+                mesa libgbm libglvnd giflib ffmpeg openjph libwebp robin-map
+                cmake ninja;
+              inherit (final) qt6;
+            };
+            spektrafilm = python-final.callPackage ./pkgs/spektrafilm/spektrafilm.nix {
+              inherit (final) makeWrapper;
+              qt5 = final.libsForQt5.qt5;
+            };
           })
         ];
       })
@@ -34,13 +45,7 @@ in
   # `darwinModules` and `flakeModules` names are special
   lib = import ./lib { inherit pkgs; }; # functions
   nixosModules = import ./nixos-modules; # NixOS modules
-  # homeModules = { }; # Home Manager modules
-  # darwinModules = { }; # nix-darwin modules
-  # flakeModules = { }; # flake-parts modules
   overlays = import ./overlays; # nixpkgs overlays
 
   spektrafilm = spektrafilm-pkgs.python3Packages.spektrafilm;
-  # example-package = pkgs.callPackage ./pkgs/example-package { };
-  # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
-  # ...
 }

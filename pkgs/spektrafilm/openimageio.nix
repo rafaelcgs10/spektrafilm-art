@@ -1,35 +1,71 @@
 {
-  pkgs ? import <nixpkgs> {},
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  # Build tools
+  setuptools,
+  setuptools-scm,
+  scikit-build-core,
+  cmake,
+  ninja,
+  pybind11,
+  # Python deps
+  numpy,
+  scipy,
+  # Native libs
+  fftw,
+  zlib,
+  imath,
+  openexr,
+  libjpeg,
+  libtiff,
+  libpng,
+  openimageio,
+  freetype,
+  opencolorio,
+  opencv,
+  libraw,
+  libheif,
+  mesa,
+  libgbm,
+  libglvnd,
+  qt6,
+  giflib,
+  ffmpeg,
+  openjph,
+  libwebp,
+  robin-map,
 }:
 
-pkgs.python3Packages.buildPythonPackage rec {
+buildPythonPackage rec {
   pname = "OpenImageIO";
   version = "3.1.10.0";
   pyproject = true;
 
-  src = pkgs.python3Packages.fetchPypi {
-    pname = "openimageio";   # must be lowercase
-    version = "3.1.10.0";    # use a version that actually exists
+  src = fetchPypi {
+    pname = "openimageio";
+    version = "3.1.10.0";
     sha256 = "sha256-XYA5S5YtwPg8FO/Ov8SBw9HtOr5mABsvYCJhzbHJBYo=";
   };
 
-  build-system = with pkgs.python3Packages; [
+  build-system = [
     setuptools
     setuptools-scm
     scikit-build-core
   ];
 
-  dependencies = with pkgs; [
-    python3Packages.numpy
-    python3Packages.scipy
+  dependencies = [
+    numpy
+    scipy
   ];
 
-  nativeBuildInputs = with pkgs; [
+  nativeBuildInputs = [
     fftw
     cmake
     ninja
   ];
-  buildInputs = with pkgs; [
+
+  buildInputs = [
     zlib
     imath
     openexr
@@ -52,9 +88,8 @@ pkgs.python3Packages.buildPythonPackage rec {
     openjph
     libwebp
     robin-map
-  ] ++ (with pkgs.python3Packages; [
     pybind11
-  ]);
+  ];
 
   # The PyPI tarball doesn't ship testsuite/, but CMake references it
   postUnpack = ''
@@ -67,4 +102,9 @@ pkgs.python3Packages.buildPythonPackage rec {
 
   # Pass CMake args through scikit-build-core's environment variable
   env.SKBUILD_CMAKE_ARGS = "-DUSE_Nuke=OFF;-DOpenImageIO_BUILD_MISSING_DEPS=none";
+
+  meta = with lib; {
+    description = "Python bindings for OpenImageIO";
+    homepage = "https://openimageio.readthedocs.io/";
+  };
 }
