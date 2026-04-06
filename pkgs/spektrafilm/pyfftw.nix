@@ -1,3 +1,4 @@
+# Disclaimer: Some Claude Opus 4.6 was used to write this
 {
   lib,
   buildPythonPackage,
