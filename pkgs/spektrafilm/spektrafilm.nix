@@ -68,6 +68,8 @@ buildPythonPackage rec {
 
   postFixup = ''
     wrapProgram $out/bin/spektrafilm \
+      --unset PYTHONPATH \
+      --set QT_API pyqt5 \
       --set QT_PLUGIN_PATH "${qt5.qtbase.bin}/${qt5.qtbase.qtPluginPrefix}:${qt5.qtwayland.bin}/${qt5.qtbase.qtPluginPrefix}" \
       --set QT_QPA_PLATFORM xcb \
       --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib" \
