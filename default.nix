@@ -39,6 +39,28 @@ let
       })
     ];
   };
+
+  spektrafilm-python = spektrafilm-pkgs.python3.withPackages (ps: with ps; [ numpy scipy spektrafilm ]) ;
+  spektrafilm-art = (pkgs.art.overrideAttrs (oldAttrs: {
+    version = "1.25.11-unstable-2026-04-01";
+    src = pkgs.fetchFromGitHub {
+      owner = "artraweditor";
+      repo = "ART";
+      rev = "27554bbeab0adcd98335b0470b37c7bd3db1ae80";
+      hash = "sha256-lCn/qBQ9PEx4pf+0y0fnWHZ2b68Lu6eLKHgcDzNAYio=";
+    };
+    postInstall = (oldAttrs.postInstall or "") + ''
+      mkdir -p $out/share/ART/extlut
+      cp -r $src/tools/extlut/* $out/share/ART/extlut/
+    '';
+    nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.makeWrapper ];
+    postFixup = (oldAttrs.postFixup or "") + ''
+      wrapProgram $out/bin/ART \
+        --prefix PATH : "${spektrafilm-python}/bin"
+      wrapProgram $out/bin/ART-cli \
+        --prefix PATH : "${spektrafilm-python}/bin"
+    '';
+  }));
 in
 {
   # The `lib`, `overlays`, `nixosModules`, `homeModules`,
@@ -48,4 +70,5 @@ in
   overlays = import ./overlays; # nixpkgs overlays
 
   spektrafilm = spektrafilm-pkgs.python3Packages.spektrafilm;
+  spektrafilm-art = spektrafilm-art;
 }
