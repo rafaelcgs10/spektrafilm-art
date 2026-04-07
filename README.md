@@ -1,6 +1,6 @@
 # Spektrafilm and Spektrafilm in Art Nix derivations
 
-First, make sure with nix (either install it from https://nixos.org/download/ or use NixOS/home-manager).
+First, make sure you have nix (either install it from https://nixos.org/download/ or use NixOS/home-manager).
 
 How to install Spektrafilm
 
