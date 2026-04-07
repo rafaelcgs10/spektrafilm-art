@@ -8,6 +8,9 @@
   makeWrapper,
   # Qt
   qt5,
+  # OpenGL
+  mesa,
+  libglvnd,
   # Python dependencies
   napari,
   numpy,
@@ -72,10 +75,11 @@ buildPythonPackage rec {
       --unset PYTHONPATH \
       --set QT_API pyqt5 \
       --set QT_PLUGIN_PATH "${qt5.qtbase.bin}/${qt5.qtbase.qtPluginPrefix}:${qt5.qtwayland.bin}/${qt5.qtbase.qtPluginPrefix}" \
-      --set QT_QPA_PLATFORM xcb \
-      --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib" \
-      --set LIBGL_DRIVERS_PATH "/run/opengl-driver/lib/dri" \
-      --set __EGL_VENDOR_LIBRARY_DIRS "/run/opengl-driver/share/glvnd/egl_vendor.d"
+      --set QT_QPA_PLATFORM wayland \
+      --prefix LD_LIBRARY_PATH : "${mesa}/lib" \
+      --prefix LD_LIBRARY_PATH : "${libglvnd}/lib" \
+      --set LIBGL_DRIVERS_PATH "${mesa}/lib/dri" \
+      --set __EGL_VENDOR_LIBRARY_DIRS "${mesa}/share/glvnd/egl_vendor.d"
   '';
 
   meta = with lib; {

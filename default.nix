@@ -23,7 +23,7 @@ let
               inherit (final) qt6;
             };
             spektrafilm = python-final.callPackage ./pkgs/spektrafilm/spektrafilm.nix {
-              inherit (final) makeWrapper;
+              inherit (final) makeWrapper mesa libglvnd;
               qt5 = final.libsForQt5.qt5;
             };
           })
