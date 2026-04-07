@@ -12,3 +12,5 @@ How to install Art with Spektrafilm
 ```
 nix profile add --extra-experimental-features nix-command --extra-experimental-features flakes github:rafaelcgs10/spektrafilm-art#spektrafilm-art
 ```
+
+Note: I only tested this on Fedora Linux with Nix, and NixOS.
